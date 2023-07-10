@@ -1,5 +1,6 @@
 let SHOULD_BOOMERANG = true;
 let MOUSE_CONTROL = false;
+let SHOULD_RECORD = false;
 
 let SOURCE_01 = "source_files/01";
 let SOURCE_01_LENGTH = 605;
@@ -8,6 +9,8 @@ const SOURCE_VARIATIONS = ["a", "b"];
 let mySound, mySound2;
 let soundFilePath = "sounds/explosion-sound.mp3";
 let soundFilePath2 = "sounds/flower-sound.mp3";
+
+let mic, recorder, soundFile;
 
 let images = [];
 let sourceImagesLength = 0;
@@ -75,6 +78,18 @@ function setup() {
   osc = new p5.Oscillator(1200);
 
   cnv.mousePressed(onCanvasClick);
+
+  if (SHOULD_RECORD) {
+    // create a sound recorder
+    recorder = new p5.SoundRecorder();
+    // connect sound to the recorder
+    recorder.setInput();
+    soundFile = new p5.SoundFile();
+
+    recorder.record(soundFile, 200, () => {
+      save(soundFile, "mySound.wav");
+    });
+  }
 }
 
 function draw() {
@@ -220,14 +235,24 @@ function draw() {
   mySound.rate(playbackRate);
   mySound2.rate(playbackRate);
 
+  console.log(soundOut);
+
+  console.log("recorder", recorder);
+
   //   freq = currSourceImageIndex == 0 ? 200 : 440;
   //   osc.freq(freq + freq / 2 + freq / 4 + freq / 8);
   //   mySound.play();
 }
 
 function onCanvasClick() {
-  shouldDraw = true;
-  frameCount = 0;
-  mySound.loop();
-  mySound2.loop();
+  if (!shouldDraw) {
+    shouldDraw = true;
+    frameCount = 0;
+    mySound.loop();
+    mySound2.loop();
+  } else {
+    if (SHOULD_RECORD) {
+      recorder.stop();
+    }
+  }
 }
