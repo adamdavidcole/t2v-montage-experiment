@@ -46,14 +46,29 @@ function constrainMap(
 function preload() {
   SOURCE_VARIATIONS.forEach((sourceVariation) => {
     let sourceImages = [];
+    const urls = [];
+
     for (let i = 0; i < SOURCE_01_LENGTH; i++) {
       let filenum = `${i}`.padStart(3, "0");
       let filename = `${filenum}.jpg`;
       let filepath = `${SOURCE_01}/${sourceVariation}/${filename}`;
-      img = loadImage(filepath);
-      sourceImages.push(img);
-      console.log("filepath: ", filepath);
+
+      urls.push(filepath);
+      //   img = loadImage(filepath);
+      //   sourceImages.push(img);
+      //   console.log("filepath: ", filepath);
     }
+
+    function loadSingleImage(urls, i) {
+      if (i >= SOURCE_01_LENGTH) return;
+
+      loadImage(urls[i], (img) => {
+        sourceImages.push(img);
+        loadSingleImage(urls, i + 1);
+      });
+    }
+
+    loadSingleImage(urls, 0);
 
     images.push(sourceImages);
   });
